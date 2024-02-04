@@ -8,10 +8,17 @@ import _ from 'lodash';
 
 const getUniqueOptions = (arr, key) => {
   const uni =  _.uniqBy(arr, key);
-  return uni.map((item) => {
+  const opts =  uni.map((item) => {
     if (!item[key]) return { value: '', label: 'Other' };
     return { value: item[key], label: item[key] };
   });
+
+  return _.sortBy(opts, o => o.value );
+
+  const asdf = opts;
+  debugger
+
+  return opts.sort((a, b) => a - b);
 };
 
 const Finder = () => {
@@ -37,6 +44,7 @@ const Finder = () => {
 
   useEffect(() => {
     let workingMatches = gear;
+
     if (realms.length > 0) {
       workingMatches  = workingMatches.filter((item) => realms.includes(item.realm));
     }
