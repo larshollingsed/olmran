@@ -81334,4 +81334,7 @@ const data = [
 // }, []);
 
 // console.log(duplicates.filter(d => d.count > 1));
+
+const limitedData = data.slice(0, 200);
+export { limitedData };
 export default data;

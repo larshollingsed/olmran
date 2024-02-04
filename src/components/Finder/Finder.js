@@ -1,44 +1,59 @@
 import React, { useEffect, useState } from 'react';
-import { FormLabel, Text } from '@chakra-ui/react';
+import { Box, FormLabel, Text } from '@chakra-ui/react';
 import Select from 'react-select';
 import Table from '../Table';
 import gear from '../../data/gear.js';
+// import { limitedData as gear } from '../../data/gear.js';
+import _ from 'lodash';
 
-var resArr = [];
-gear.filter(function(item){
-  var i = resArr.findIndex(x => (x.item == item.item));
-  if(i <= -1){
-        resArr.push(item);
-  }
-  return null;
-});
-console.log(resArr)
-
-const realmOptions = [
-  { value: 'Chaos', label: 'Chaos' },
-  { value: 'Evil', label: 'Evil' },
-  { value: 'Good', label: 'Good' },
-  { value: 'Kaid Red', label: 'Kaid Red' },
-  { value: 'Kaid Green', label: 'Kaid Green' },
-  { value: 'Kaid Purple', label: 'Kaid Purple' },
-  { value: 'Event', label: 'Event' },
-]
+const getUniqueOptions = (arr, key) => {
+  const uni =  _.uniqBy(arr, key);
+  return uni.map((item) => {
+    if (!item[key]) return { value: '', label: 'Other' };
+    return { value: item[key], label: item[key] };
+  });
+};
 
 const Finder = () => {
   const [matches, setMatches] = useState(gear);
   const [realms, setRealms] = useState([]);
+  const [slots, setSlots] = useState([]);
+  const [levels, setLevels] = useState([]);
+  const [realmOptions, setRealmOptions] = useState([]);
+  const [slotOptions, setSlotOptions] = useState([]);
+  const [levelOptions, setLevelOptions] = useState([]);
 
   useEffect(() => {
-    if (realms.length === 0) {
-      setMatches(gear);
-    } else {
-      const filtered = gear.filter((item) => realms.includes(item.realm));
-      setMatches(filtered);
+    setRealmOptions(getUniqueOptions(gear, 'realm'));
+  }, []);
+
+  useEffect(() => {
+    setSlotOptions(getUniqueOptions(gear, 'slot'));
+  }, []);
+
+  useEffect(() => {
+    setLevelOptions(getUniqueOptions(gear, 'level'));
+  }, []);
+
+  useEffect(() => {
+    let workingMatches = gear;
+    if (realms.length > 0) {
+      workingMatches  = workingMatches.filter((item) => realms.includes(item.realm));
     }
-  }, [realms]);
+
+    if (slots.length > 0) {
+      workingMatches  = workingMatches.filter((item) => slots.includes(item.slot));
+    }
+
+    if (levels.length > 0) {
+      workingMatches  = workingMatches.filter((item) => levels.includes(item.level));
+    }
+
+    setMatches(workingMatches);
+  }, [realms, slots, levels]);
 
   return (
-    <div>
+    <Box p="20px">
       <Text fontSize="3xl" color="teal.500">
         Find some gear
       </Text>
@@ -51,8 +66,26 @@ const Finder = () => {
         onChange={e => setRealms(e.map(r => r.value))}
         options={realmOptions}
       />
+      <FormLabel>
+        Slot
+      </FormLabel>
+      <Select
+        placeholder="Select one or slots"
+        isMulti
+        onChange={e => setSlots(e.map(r => r.value))}
+        options={slotOptions}
+      />
+      <FormLabel>
+        Level
+      </FormLabel>
+      <Select
+        placeholder="Select one or levels"
+        isMulti
+        onChange={e => setLevels(e.map(r => r.value))}
+        options={levelOptions}
+      />
       <Table data={matches} />
-    </div>
+    </Box>
   );
 };
 
