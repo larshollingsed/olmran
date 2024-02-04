@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, FormLabel, Text } from '@chakra-ui/react';
+import { Box, FormLabel, HStack, Text } from '@chakra-ui/react';
 import Select from 'react-select';
 import Table from '../Table';
 import gear from '../../data/gear.js';
@@ -14,11 +14,6 @@ const getUniqueOptions = (arr, key) => {
   });
 
   return _.sortBy(opts, o => o.value );
-
-  const asdf = opts;
-  debugger
-
-  return opts.sort((a, b) => a - b);
 };
 
 const Finder = () => {
@@ -65,33 +60,41 @@ const Finder = () => {
       <Text fontSize="3xl" color="teal.500">
         Find some gear
       </Text>
-      <FormLabel>
-        Realm
-      </FormLabel>
-      <Select
-        placeholder="Select one or more realms (or event)"
-        isMulti
-        onChange={e => setRealms(e.map(r => r.value))}
-        options={realmOptions}
-      />
-      <FormLabel>
-        Slot
-      </FormLabel>
-      <Select
-        placeholder="Select one or slots"
-        isMulti
-        onChange={e => setSlots(e.map(r => r.value))}
-        options={slotOptions}
-      />
-      <FormLabel>
-        Level
-      </FormLabel>
-      <Select
-        placeholder="Select one or levels"
-        isMulti
-        onChange={e => setLevels(e.map(r => r.value))}
-        options={levelOptions}
-      />
+      <HStack>
+        <Box>
+          <FormLabel>
+            Realm
+          </FormLabel>
+          <Select
+            placeholder="Select one or more realms (or event)"
+            isMulti
+            onChange={e => setRealms(e.map(r => r.value))}
+            options={realmOptions}
+          />
+        </Box>
+        <Box>
+          <FormLabel>
+            Slot
+          </FormLabel>
+          <Select
+            placeholder="Select one or more slots"
+            isMulti
+            onChange={e => setSlots(e.map(r => r.value))}
+            options={slotOptions}
+          />
+        </Box>
+        <Box>
+          <FormLabel>
+            Level
+          </FormLabel>
+          <Select
+            placeholder="Select one or more levels"
+            isMulti
+            onChange={e => setLevels(e.map(r => r.value))}
+            options={levelOptions}
+          />
+        </Box>
+        </HStack>
       <Table data={matches} />
     </Box>
   );
