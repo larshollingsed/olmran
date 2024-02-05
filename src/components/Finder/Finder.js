@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box,
+  Flex,
   FormLabel,
   Text,
 } from '@chakra-ui/react';
 import Select from 'react-select';
 import Table from '../Table';
-// import gear from '../../data/gear.js';
-import { limitedData as gear } from '../../data/gear.js';
+import gear from '../../data/gear.js';
+// import { limitedData as gear } from '../../data/gear.js';
 import _ from 'lodash';
 
 const getUniqueOptions = (arr, key) => {
@@ -28,6 +29,15 @@ const getMaxLevelOptions = (min) => levelRange.filter(l => l >= min).map(l => ({
 
 const realmOptions = getUniqueOptions(gear, 'realm');
 const slotOptions = getUniqueOptions(gear, 'slot');
+const effectOptions = getUniqueOptions(gear, 'spell');
+const typeOptions = getUniqueOptions(gear, 'type');
+const sigilOptions = getUniqueOptions(gear, 'sigil');
+
+const filterWithPredicates = (list, predicates) => (
+  list.filter(item => (
+    Object.values(predicates).every(predicate => predicate(item))
+  ))
+);
 
 const Finder = () => {
   const [matches, setMatches] = useState(gear);
@@ -35,6 +45,9 @@ const Finder = () => {
   const [slots, setSlots] = useState([]);
   const [minLevel, setMinLevel] = useState(1);
   const [maxLevel, setMaxLevel] = useState(60);
+  const [effects, setEffects] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [sigils, setSigils] = useState([]);
   const [minLevelOptions, setMinLevelOptions] = useState(getMinLevelOptions(60));
   const [maxLevelOptions, setMaxLevelOptions] = useState(getMaxLevelOptions(1));
 
@@ -58,18 +71,21 @@ const Finder = () => {
       if (slots.length > 0) {
         predicates.slot = (record) => slots.includes(record.slot);
       }
-      
-      const filterWithPredicates = (list, predicates) => {
-        return list.filter(item => {
-          return Object.values(predicates).every(predicate => {
-            if (predicate(item)) { return true }
-          })
-          return false;
-        });
-      };
+
+      if (effects.length > 0) {
+        predicates.spell = (record) => effects.includes(record.spell);
+      }
+
+      if (types.length > 0) {
+        predicates.type = (record) => types.includes(record.type);
+      }
+
+      if (sigils.length > 0) {
+        predicates.sigil = (record) => sigils.includes(record.sigil);
+      }
 
       setMatches(filterWithPredicates(gear, predicates));
-  }, [realms, slots, minLevel, maxLevel]);
+  }, [realms, slots, minLevel, maxLevel, effects, types, sigils]);
 
   return (
     <Box p="20px">
@@ -80,6 +96,7 @@ const Finder = () => {
           Realm
         </FormLabel>
         <Select
+          style={{ maxWidth: "900px" }}
           placeholder="Select one or more realms (or event)"
           isMulti
           onChange={e => setRealms(e.map(r => r.value))}
@@ -89,31 +106,62 @@ const Finder = () => {
           Slot
         </FormLabel>
         <Select
+          style={{ maxWidth: "900px" }}
           placeholder="Select one or more slots"
           isMulti
           onChange={e => setSlots(e.map(r => r.value))}
           options={slotOptions}
         />
-        <Box w="200px">
-          <FormLabel>
-            Minimum Level
-          </FormLabel>
-          <Select
-            placeholder="Minimum Level"
-            onChange={e => setMinLevel(e.value)}
-            options={minLevelOptions}
-          />
-        </Box>
-        <Box w="200px">
-          <FormLabel>
-            Maximum Level
-          </FormLabel>
-          <Select
-            placeholder="Maximum Level"
-            onChange={e => setMaxLevel(e.value)}
-            options={maxLevelOptions}
-          />
-        </Box>  
+        <FormLabel>
+          Types
+        </FormLabel>
+        <Select
+          style={{ maxWidth: "900px" }}
+          placeholder="Select one or more types"
+          isMulti
+          onChange={e => setTypes(e.map(r => r.value))}
+          options={typeOptions}
+        />
+        <Flex>
+          <Box w="200px">
+            <FormLabel>
+              Minimum Level
+            </FormLabel>
+            <Select
+              placeholder="Minimum Level"
+              onChange={e => setMinLevel(e.value)}
+              options={minLevelOptions}
+            />
+          </Box>
+          <Box w="200px" marginLeft="20px">
+            <FormLabel>
+              Maximum Level
+            </FormLabel>
+            <Select
+              placeholder="Maximum Level"
+              onChange={e => setMaxLevel(e.value)}
+              options={maxLevelOptions}
+            />
+          </Box>
+        </Flex>
+        <FormLabel>
+          Effects
+        </FormLabel>
+        <Select
+          placeholder="Select one or more effects"
+          isMulti
+          onChange={e => setEffects(e.map(r => r.value))}
+          options={effectOptions}
+        />
+        <FormLabel>
+          Sigils
+        </FormLabel>
+        <Select
+          placeholder="Select one or more sigils"
+          isMulti
+          onChange={e => setSigils(e.map(r => r.value))}
+          options={sigilOptions}
+        />
       <Table data={matches} />
     </Box>
   );

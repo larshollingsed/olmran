@@ -1,15 +1,15 @@
 import React from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
+import { Chakra } from './providers';
 import './App.css';
 import Finder from './components/Finder';
 
 function App() {
   return (
-    <ChakraProvider>
+    <Chakra>
       <div>
         <Finder />
       </div>
-    </ChakraProvider>
+    </Chakra>
   );
 }
 

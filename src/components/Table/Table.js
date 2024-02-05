@@ -1,15 +1,15 @@
 import React from 'react';
-import { TableContainer, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
+import { TableContainer, TableCaption, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
 
 const style = {
   border: '1px solid black',
   padding: '5px',
+  textWrap: 'wrap',
 };
 
 const Main = ({ data }) => (
-  <TableContainer>
+  <TableContainer marginTop="20px">
     <Table variant='simple' style={{ borderCollapse: 'collapse' }}>
-      {/* <TableCaption>Imperial to metric conversion factors</TableCaption> */}
       <Thead>
         <Tr>
           <Th style={style}>Realm</Th>
