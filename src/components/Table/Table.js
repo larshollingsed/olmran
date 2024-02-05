@@ -7,7 +7,7 @@ const style = {
   textWrap: 'wrap',
 };
 
-const Main = ({ data }) => (
+const Main = ({ data, showFullInfo }) => (
   <TableContainer marginTop="20px">
     <Table variant='simple' style={{ borderCollapse: 'collapse' }}>
       <Thead>
@@ -20,16 +20,16 @@ const Main = ({ data }) => (
           <Th style={style}>Type</Th>
           <Th style={style}>Spell</Th>
           <Th style={style}>Level</Th>
-          <Th style={style}>Damage</Th>
-          <Th style={style}>Timer</Th>
-          <Th style={style}>Fumble</Th>
-          <Th style={style}>Accuracy</Th>
-          <Th style={style}>Defense</Th>
+          {showFullInfo && (<Th style={style}>Damage</Th> )}
+          {showFullInfo && (<Th style={style}>Timer</Th> )}
+          {showFullInfo && (<Th style={style}>Fumble</Th> )}
+          {showFullInfo && (<Th style={style}>Accuracy</Th> )}
+          {showFullInfo && (<Th style={style}>Defense</Th> )}
           <Th style={style}>Sigil</Th>
           <Th style={style}>SigilLvl</Th>
-          <Th style={style}>Weight</Th>
-          <Th style={style}>Notes</Th>
-          <Th style={style}>Last Updated</Th>
+          {showFullInfo && (<Th style={style}>Weight</Th>)}
+          {showFullInfo && (<Th style={style}>Notes</Th>)}
+          {showFullInfo && (<Th style={style}>Last Updated</Th>)}
         </Tr>
       </Thead>
       <Tbody>
@@ -43,16 +43,16 @@ const Main = ({ data }) => (
             <Td style={style}>{item.type}</Td>
             <Td style={style}>{item.spell}</Td>
             <Td style={style}>{item.level}</Td>
-            <Td style={style}>{item.damage}</Td>
-            <Td style={style}>{item.timer}</Td>
-            <Td style={style}>{item.fumble}</Td>
-            <Td style={style}>{item.accuracy}</Td>
-            <Td style={style}>{item.defense}</Td>
+            {showFullInfo && (<Td style={style}>{item.damage}</Td>)}
+            {showFullInfo && (<Td style={style}>{item.timer}</Td>)}
+            {showFullInfo && (<Td style={style}>{item.fumble}</Td>)}
+            {showFullInfo && (<Td style={style}>{item.accuracy}</Td>)}
+            {showFullInfo && (<Td style={style}>{item.defense}</Td>)}
             <Td style={style}>{item.sigil}</Td>
             <Td style={style}>{item.sigilLvl}</Td>
-            <Td style={style}>{item.weight}</Td>
-            <Td style={style}>{item.notes}</Td>
-            <Td style={style}>{item.lastUpdated}</Td>
+            {showFullInfo && (<Td style={style}>{item.weight}</Td>)}
+            {showFullInfo && (<Td style={style}>{item.notes}</Td>)}
+            {showFullInfo && (<Td style={style}>{item.lastUpdated}</Td>)}
           </Tr>
         ))}
       </Tbody>

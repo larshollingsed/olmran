@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box,
+  Checkbox,
   Flex,
   FormLabel,
   Text,
@@ -14,7 +15,8 @@ import _ from 'lodash';
 const getUniqueOptions = (arr, key) => {
   const uni =  _.uniqBy(arr, key);
   const opts =  uni.map((item) => {
-    if (!item[key]) return { value: '', label: 'Other' };
+    // if the key is empty, we want to include it in the list
+    if (!item[key]) return { value: '', label: 'other' };
     return { value: item[key], label: item[key] };
   });
 
@@ -24,7 +26,6 @@ const getUniqueOptions = (arr, key) => {
 const levelRange = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
 
 const getMinLevelOptions = (max) => levelRange.filter(l => l <= max).map(l => ({ value: l, label: l }));
-
 const getMaxLevelOptions = (min) => levelRange.filter(l => l >= min).map(l => ({ value: l, label: l }));
 
 const realmOptions = getUniqueOptions(gear, 'realm');
@@ -40,6 +41,7 @@ const filterWithPredicates = (list, predicates) => (
 );
 
 const Finder = () => {
+  // TODO: move to reducer?
   const [matches, setMatches] = useState(gear);
   const [realms, setRealms] = useState([]);
   const [slots, setSlots] = useState([]);
@@ -50,6 +52,8 @@ const Finder = () => {
   const [sigils, setSigils] = useState([]);
   const [minLevelOptions, setMinLevelOptions] = useState(getMinLevelOptions(60));
   const [maxLevelOptions, setMaxLevelOptions] = useState(getMaxLevelOptions(1));
+
+  const [showFullInfo, setShowFullInfo] = useState(true);
 
   useEffect(() => {
     setMinLevelOptions(getMinLevelOptions(maxLevel));
@@ -64,12 +68,18 @@ const Finder = () => {
         level: (record) => record.level >= minLevel && record.level <= maxLevel,
       };
 
+      const workingTypes = [...types];
+
       if (realms.length > 0) {
         predicates.realm = (record) => realms.includes(record.realm);
       }
 
       if (slots.length > 0) {
         predicates.slot = (record) => slots.includes(record.slot);
+        // if we're looking for jewels, we also want to include items that don't have a slot
+        if (slots.includes('jewel')) {
+          workingTypes.push('')
+        }
       }
 
       if (effects.length > 0) {
@@ -77,7 +87,7 @@ const Finder = () => {
       }
 
       if (types.length > 0) {
-        predicates.type = (record) => types.includes(record.type);
+        predicates.type = (record) => workingTypes.includes(record.type);
       }
 
       if (sigils.length > 0) {
@@ -93,7 +103,7 @@ const Finder = () => {
         Find some gear
       </Text>
         <FormLabel>
-          Realm
+          Realms
         </FormLabel>
         <Select
           style={{ maxWidth: "900px" }}
@@ -103,7 +113,7 @@ const Finder = () => {
           options={realmOptions}
         />
         <FormLabel>
-          Slot
+          Slots
         </FormLabel>
         <Select
           style={{ maxWidth: "900px" }}
@@ -162,7 +172,16 @@ const Finder = () => {
           onChange={e => setSigils(e.map(r => r.value))}
           options={sigilOptions}
         />
-      <Table data={matches} />
+        <Box marginTop="20px">
+          <Checkbox
+            defaultChecked
+            onChange={() => setShowFullInfo(!showFullInfo)}
+            isChecked={showFullInfo}
+          >
+            Show full info
+          </Checkbox>
+        </Box>
+      <Table data={matches} showFullInfo={showFullInfo} />
     </Box>
   );
 };

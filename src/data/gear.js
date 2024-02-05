@@ -56644,7 +56644,7 @@ const data = [
     "area": "Shrouded Castle of Craebaen",
     "mob": "Craebaen royal lieutenant",
     "item": "chestplate of arcane protection",
-    "slot": "chest",
+    "slot": "body",
     "type": "plate",
     "spell": "combat.i",
     "level": 45,
