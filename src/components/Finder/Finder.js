@@ -20,7 +20,7 @@ const getUniqueOptions = (arr, key) => {
     return { value: item[key], label: item[key] };
   });
 
-  return _.sortBy(opts, o => o.value );
+  return _.sortBy(opts, ['value']);
 };
 
 const levelRange = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
@@ -53,6 +53,9 @@ const Finder = () => {
   const [minLevelOptions, setMinLevelOptions] = useState(getMinLevelOptions(60));
   const [maxLevelOptions, setMaxLevelOptions] = useState(getMaxLevelOptions(1));
 
+  const [sortBy, setSortBy] = useState('realm');
+  const [order, setOrder] = useState('asc');
+  
   const [showFullInfo, setShowFullInfo] = useState(true);
 
   useEffect(() => {
@@ -94,8 +97,22 @@ const Finder = () => {
         predicates.sigil = (record) => sigils.includes(record.sigil);
       }
 
-      setMatches(filterWithPredicates(gear, predicates));
+      const matches = filterWithPredicates(gear, predicates);
+      setMatches(matches);
   }, [realms, slots, minLevel, maxLevel, effects, types, sigils]);
+
+  useEffect(() => {
+    setMatches(_.orderBy(matches, sortBy, order));
+  }, [sortBy, order, matches]);
+
+  const updateSort = (col) => {
+    if (col === sortBy) {
+      setOrder(order === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(col);
+      setOrder('asc');
+    }
+  };
 
   return (
     <Box p="20px">
@@ -181,7 +198,13 @@ const Finder = () => {
             Show full info
           </Checkbox>
         </Box>
-      <Table data={matches} showFullInfo={showFullInfo} />
+      <Table
+        data={matches}
+        showFullInfo={showFullInfo}
+        updateSort={updateSort}
+        isAsc={order === 'asc'}
+        sortBy={sortBy}
+      />
     </Box>
   );
 };

@@ -1,5 +1,14 @@
 import React from 'react';
-import { TableContainer, TableCaption, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
+import {
+  TableContainer,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+} from '@chakra-ui/react';
+import TableHeaderButton from '../TableHeaderButton';
 
 const style = {
   border: '1px solid black',
@@ -7,25 +16,41 @@ const style = {
   textWrap: 'wrap',
 };
 
-const Main = ({ data, showFullInfo }) => (
+const Main = ({ data, showFullInfo, updateSort, isAsc, sortBy }) => (
   <TableContainer marginTop="20px">
     <Table variant='simple' style={{ borderCollapse: 'collapse' }}>
       <Thead>
         <Tr>
-          <Th style={style}>Realm</Th>
-          <Th style={style}>Area</Th>
+          <Th style={style}>
+            <TableHeaderButton updateSort={updateSort} isAsc={isAsc} sortBy={sortBy} value="realm" />
+          </Th>
+          <Th style={style}>
+            <TableHeaderButton updateSort={updateSort} isAsc={isAsc} sortBy={sortBy} value="area" />
+          </Th>
           <Th style={style}>Mob</Th>
-          <Th style={style}>Item</Th>
-          <Th style={style}>Slot</Th>
-          <Th style={style}>Type</Th>
-          <Th style={style}>Spell</Th>
-          <Th style={style}>Level</Th>
+          <Th style={style}>
+            <TableHeaderButton updateSort={updateSort} isAsc={isAsc} sortBy={sortBy} value="item" />
+          </Th>
+          <Th style={style}>
+            <TableHeaderButton updateSort={updateSort} isAsc={isAsc} sortBy={sortBy} value="slot" />
+          </Th>
+          <Th style={style}>
+            <TableHeaderButton updateSort={updateSort} isAsc={isAsc} sortBy={sortBy} value="type" />
+          </Th>
+          <Th style={style}>
+            <TableHeaderButton updateSort={updateSort} isAsc={isAsc} sortBy={sortBy} value="spell" header="Effect" />
+          </Th>
+          <Th style={style}>
+            <TableHeaderButton updateSort={updateSort} isAsc={isAsc} sortBy={sortBy} value="level" />
+          </Th>
           {showFullInfo && (<Th style={style}>Damage</Th> )}
           {showFullInfo && (<Th style={style}>Timer</Th> )}
           {showFullInfo && (<Th style={style}>Fumble</Th> )}
           {showFullInfo && (<Th style={style}>Accuracy</Th> )}
           {showFullInfo && (<Th style={style}>Defense</Th> )}
-          <Th style={style}>Sigil</Th>
+          <Th style={style}>
+            <TableHeaderButton updateSort={updateSort} isAsc={isAsc} sortBy={sortBy} value="sigil" />
+          </Th>
           <Th style={style}>SigilLvl</Th>
           {showFullInfo && (<Th style={style}>Weight</Th>)}
           {showFullInfo && (<Th style={style}>Notes</Th>)}
