@@ -119,85 +119,94 @@ const Finder = () => {
       <Text fontSize="3xl" color="teal.500">
         Find some gear
       </Text>
-        <FormLabel>
-          Realms
-        </FormLabel>
-        <Select
-          style={{ maxWidth: "900px" }}
-          placeholder="Select one or more realms (or event)"
-          isMulti
-          onChange={e => setRealms(e.map(r => r.value))}
-          options={realmOptions}
-        />
-        <FormLabel>
-          Slots
-        </FormLabel>
-        <Select
-          style={{ maxWidth: "900px" }}
-          placeholder="Select one or more slots"
-          isMulti
-          onChange={e => setSlots(e.map(r => r.value))}
-          options={slotOptions}
-        />
-        <FormLabel>
-          Types
-        </FormLabel>
-        <Select
-          style={{ maxWidth: "900px" }}
-          placeholder="Select one or more types"
-          isMulti
-          onChange={e => setTypes(e.map(r => r.value))}
-          options={typeOptions}
-        />
-        <Flex>
-          <Box w="200px">
-            <FormLabel>
-              Minimum Level
-            </FormLabel>
-            <Select
-              placeholder="Minimum Level"
-              onChange={e => setMinLevel(e.value)}
-              options={minLevelOptions}
-            />
-          </Box>
-          <Box w="200px" marginLeft="20px">
-            <FormLabel>
-              Maximum Level
-            </FormLabel>
-            <Select
-              placeholder="Maximum Level"
-              onChange={e => setMaxLevel(e.value)}
-              options={maxLevelOptions}
-            />
-          </Box>
-        </Flex>
-        <FormLabel>
-          Effects
-        </FormLabel>
-        <Select
-          placeholder="Select one or more effects"
-          isMulti
-          onChange={e => setEffects(e.map(r => r.value))}
-          options={effectOptions}
-        />
-        <FormLabel>
-          Sigils
-        </FormLabel>
-        <Select
-          placeholder="Select one or more sigils"
-          isMulti
-          onChange={e => setSigils(e.map(r => r.value))}
-          options={sigilOptions}
-        />
-        <Box marginTop="20px">
-          <Checkbox
-            defaultChecked
-            onChange={() => setShowFullInfo(!showFullInfo)}
-            isChecked={showFullInfo}
-          >
-            Show full info
-          </Checkbox>
+      <Box m="50px" maxWidth="500px">
+        <Text fontSize="xl" color="teal.500">
+          Notes:
+        </Text>
+        <Text fontSize="lg">
+          I added table sorting but everything is happening client side so it's super slow.  Gonna move this stuff to an
+          API soon.
+        </Text>
+      </Box>
+      <FormLabel>
+        Realms
+      </FormLabel>
+      <Select
+        style={{ maxWidth: "900px" }}
+        placeholder="Select one or more realms (or event)"
+        isMulti
+        onChange={e => setRealms(e.map(r => r.value))}
+        options={realmOptions}
+      />
+      <FormLabel>
+        Slots
+      </FormLabel>
+      <Select
+        style={{ maxWidth: "900px" }}
+        placeholder="Select one or more slots"
+        isMulti
+        onChange={e => setSlots(e.map(r => r.value))}
+        options={slotOptions}
+      />
+      <FormLabel>
+        Types
+      </FormLabel>
+      <Select
+        style={{ maxWidth: "900px" }}
+        placeholder="Select one or more types"
+        isMulti
+        onChange={e => setTypes(e.map(r => r.value))}
+        options={typeOptions}
+      />
+      <Flex>
+        <Box w="200px">
+          <FormLabel>
+            Minimum Level
+          </FormLabel>
+          <Select
+            placeholder="Minimum Level"
+            onChange={e => setMinLevel(e.value)}
+            options={minLevelOptions}
+          />
         </Box>
+        <Box w="200px" marginLeft="20px">
+          <FormLabel>
+            Maximum Level
+          </FormLabel>
+          <Select
+            placeholder="Maximum Level"
+            onChange={e => setMaxLevel(e.value)}
+            options={maxLevelOptions}
+          />
+        </Box>
+      </Flex>
+      <FormLabel>
+        Effects
+      </FormLabel>
+      <Select
+        placeholder="Select one or more effects"
+        isMulti
+        onChange={e => setEffects(e.map(r => r.value))}
+        options={effectOptions}
+      />
+      <FormLabel>
+        Sigils
+      </FormLabel>
+      <Select
+        placeholder="Select one or more sigils"
+        isMulti
+        onChange={e => setSigils(e.map(r => r.value))}
+        options={sigilOptions}
+      />
+      <Box marginTop="20px">
+        <Checkbox
+          defaultChecked
+          onChange={() => setShowFullInfo(!showFullInfo)}
+          isChecked={showFullInfo}
+        >
+          Show full info
+        </Checkbox>
+      </Box>
       <Table
         data={matches}
         showFullInfo={showFullInfo}
