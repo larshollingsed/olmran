@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box,
+  Button,
   Checkbox,
   Flex,
   FormLabel,
@@ -22,6 +23,33 @@ const getUniqueOptions = (arr, key) => {
 
   return _.sortBy(opts, ['value']);
 };
+
+const getCombinations = (properties, size, items)  => {
+  const result = [];
+  function generate(combination, index) {
+    if (combination.length >= size) {
+      result.push(combination);
+    } else {
+      for (let i=index; i<items.length; i++) {
+        const item = items[i];
+
+        const totalJewels = combination.filter(i => i.slot === 'jewel').length
+        let workingProps = [...properties];
+        if (totalJewels < 2 && item.slot === 'jewel') { workingProps = workingProps.filter(p => p !== 'slot') }
+
+        if (workingProps.every(prop =>
+          combination.every(prevItem => {
+            return prevItem[prop] != item[prop]
+          })
+        )) {
+          generate([...combination, item], i+1);
+        }
+      }
+    }
+  }
+  generate([], 0);
+  return result;
+}
 
 const levelRange = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
 
@@ -57,6 +85,7 @@ const Finder = () => {
   const [order, setOrder] = useState('asc');
   
   const [showFullInfo, setShowFullInfo] = useState(true);
+  const [combos, setCombos] = useState([]);
 
   useEffect(() => {
     setMinLevelOptions(getMinLevelOptions(maxLevel));
@@ -114,6 +143,11 @@ const Finder = () => {
     }
   };
 
+  const generateCombos = () => {
+    const result = getCombinations(['slot', 'spell', 'item'], 8, matches);
+    setCombos(result);
+  }
+
   return (
     <Box p="20px">
       <Text fontSize="3xl" color="teal.500">
@@ -126,6 +160,10 @@ const Finder = () => {
         <Text fontSize="lg">
           I added table sorting but everything is happening client side so it's super slow.  Gonna move this stuff to an
           API soon.
+
+          In order to generate all possible gear options, choose exactly 8 effects, your desired types, and 'Other'.  To speed up and narrow down
+          also set the realms and min/max levels to a smaller (or single) range.
+          Then click "Generate" and be patient.  Let me know if anything looks wonky.
         </Text>
       </Box>
       <FormLabel>
@@ -207,6 +245,7 @@ const Finder = () => {
           Show full info
         </Checkbox>
       </Box>
+      {effects.length === 8 && <Button m="20px" onClick={generateCombos}>Generate</Button>}
       <Table
         data={matches}
         showFullInfo={showFullInfo}
@@ -214,6 +253,17 @@ const Finder = () => {
         isAsc={order === 'asc'}
         sortBy={sortBy}
       />
+      {combos.length > 0 && (
+        combos.map((combo, i) => (
+          <Table
+            key={i}
+            data={combo}
+            showFullInfo={showFullInfo}
+            updateSort={updateSort}
+            isAsc={order === 'asc'}
+            sortBy={sortBy}
+          />
+      )))}
     </Box>
   );
 };
