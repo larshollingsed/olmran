@@ -9,68 +9,20 @@ import {
 } from '@chakra-ui/react';
 import Select from 'react-select';
 import Table from '../Table';
-import gear from '../../data/gear.js';
-// import { limitedData as gear } from '../../data/gear.js';
 import _ from 'lodash';
-
-const getUniqueOptions = (arr, key) => {
-  const uni =  _.uniqBy(arr, key);
-  const opts =  uni.map((item) => {
-    // if the key is empty, we want to include it in the list
-    if (!item[key]) return { value: '', label: 'other' };
-    return { value: item[key], label: item[key] };
-  });
-
-  return _.sortBy(opts, ['value']);
-};
-
-const getCombinations = (properties, size, items)  => {
-  const result = [];
-  function generate(combination, index) {
-    if (combination.length >= size) {
-      result.push(combination);
-    } else {
-      for (let i=index; i<items.length; i++) {
-        const item = items[i];
-
-        const totalJewels = combination.filter(i => i.slot === 'jewel').length
-        let workingProps = [...properties];
-        if (totalJewels < 2 && item.slot === 'jewel') { workingProps = workingProps.filter(p => p !== 'slot') }
-
-        if (workingProps.every(prop =>
-          combination.every(prevItem => {
-            return prevItem[prop] != item[prop]
-          })
-        )) {
-          generate([...combination, item], i+1);
-        }
-      }
-    }
-  }
-  generate([], 0);
-  return result;
-}
+import qs from 'qs';
 
 const levelRange = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
 
 const getMinLevelOptions = (max) => levelRange.filter(l => l <= max).map(l => ({ value: l, label: l }));
 const getMaxLevelOptions = (min) => levelRange.filter(l => l >= min).map(l => ({ value: l, label: l }));
 
-const realmOptions = getUniqueOptions(gear, 'realm');
-const slotOptions = getUniqueOptions(gear, 'slot');
-const effectOptions = getUniqueOptions(gear, 'spell');
-const typeOptions = getUniqueOptions(gear, 'type');
-const sigilOptions = getUniqueOptions(gear, 'sigil');
-
-const filterWithPredicates = (list, predicates) => (
-  list.filter(item => (
-    Object.values(predicates).every(predicate => predicate(item))
-  ))
-);
+// const baseUrl = 'http://localhost:5000';
+const baseUrl = 'https://olmran-api.vercel.app';
 
 const Finder = () => {
   // TODO: move to reducer?
-  const [matches, setMatches] = useState(gear);
+  const [matches, setMatches] = useState([]);
   const [realms, setRealms] = useState([]);
   const [slots, setSlots] = useState([]);
   const [minLevel, setMinLevel] = useState(1);
@@ -80,12 +32,19 @@ const Finder = () => {
   const [sigils, setSigils] = useState([]);
   const [minLevelOptions, setMinLevelOptions] = useState(getMinLevelOptions(60));
   const [maxLevelOptions, setMaxLevelOptions] = useState(getMaxLevelOptions(1));
+  const [options, setOptions] = useState({});
 
   const [sortBy, setSortBy] = useState('realm');
   const [order, setOrder] = useState('asc');
   
   const [showFullInfo, setShowFullInfo] = useState(true);
   const [combos, setCombos] = useState([]);
+
+  useEffect(() => {
+    fetch(`${baseUrl}/initialize`)
+      .then(response => response.json())
+      .then(response => setOptions(response))
+  }, []);
 
   useEffect(() => {
     setMinLevelOptions(getMinLevelOptions(maxLevel));
@@ -96,43 +55,18 @@ const Finder = () => {
   }, [minLevel]);
 
   useEffect(() => {
-      const predicates = {
-        level: (record) => record.level >= minLevel && record.level <= maxLevel,
+      const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
       };
+      
+      // fetch('https://larson-pool-api.vercel.app/', requestOptions)
+      const url = `${baseUrl}?${qs.stringify({ types, effects, sigils, minLevel, maxLevel, slots, realms, sortBy, order }, { allowEmptyArrays: true })}`;
+      fetch(url, requestOptions)
+        .then(response => response.json())
+        .then(response => setMatches(response))
 
-      const workingTypes = [...types];
-
-      if (realms.length > 0) {
-        predicates.realm = (record) => realms.includes(record.realm);
-      }
-
-      if (slots.length > 0) {
-        predicates.slot = (record) => slots.includes(record.slot);
-        // if we're looking for jewels, we also want to include items that don't have a slot
-        if (slots.includes('jewel')) {
-          workingTypes.push('')
-        }
-      }
-
-      if (effects.length > 0) {
-        predicates.spell = (record) => effects.includes(record.spell);
-      }
-
-      if (types.length > 0) {
-        predicates.type = (record) => workingTypes.includes(record.type);
-      }
-
-      if (sigils.length > 0) {
-        predicates.sigil = (record) => sigils.includes(record.sigil);
-      }
-
-      const matches = filterWithPredicates(gear, predicates);
-      setMatches(matches);
-  }, [realms, slots, minLevel, maxLevel, effects, types, sigils]);
-
-  useEffect(() => {
-    setMatches(_.orderBy(matches, sortBy, order));
-  }, [sortBy, order, matches]);
+  }, [realms, slots, minLevel, maxLevel, effects, types, sigils, sortBy, order]);
 
   const updateSort = (col) => {
     if (col === sortBy) {
@@ -144,8 +78,9 @@ const Finder = () => {
   };
 
   const generateCombos = () => {
-    const result = getCombinations(['slot', 'spell', 'item'], 8, matches);
-    setCombos(result);
+    fetch(`${baseUrl}/combinations?${qs.stringify({ types, effects, sigils, minLevel, maxLevel, slots, realms, combos: true })}`)
+      .then(response => response.json())
+      .then(response => setCombos(response))
   }
 
   return (
@@ -160,7 +95,8 @@ const Finder = () => {
         <Text fontSize="lg">
           I added table sorting but everything is happening client side so it's super slow.  Gonna move this stuff to an
           API soon.
-
+        </Text>
+        <Text fontSize="lg" marginTop="10px">
           In order to generate all possible gear options, choose exactly 8 effects, your desired types, and 'Other'.  To speed up and narrow down
           also set the realms and min/max levels to a smaller (or single) range.
           Then click "Generate" and be patient.  Let me know if anything looks wonky.
@@ -174,7 +110,7 @@ const Finder = () => {
         placeholder="Select one or more realms (or event)"
         isMulti
         onChange={e => setRealms(e.map(r => r.value))}
-        options={realmOptions}
+        options={options.realmOptions}
       />
       <FormLabel>
         Slots
@@ -184,7 +120,7 @@ const Finder = () => {
         placeholder="Select one or more slots"
         isMulti
         onChange={e => setSlots(e.map(r => r.value))}
-        options={slotOptions}
+        options={options.slotOptions}
       />
       <FormLabel>
         Types
@@ -194,7 +130,7 @@ const Finder = () => {
         placeholder="Select one or more types"
         isMulti
         onChange={e => setTypes(e.map(r => r.value))}
-        options={typeOptions}
+        options={options.typeOptions}
       />
       <Flex>
         <Box w="200px">
@@ -225,7 +161,7 @@ const Finder = () => {
         placeholder="Select one or more effects"
         isMulti
         onChange={e => setEffects(e.map(r => r.value))}
-        options={effectOptions}
+        options={options.effectOptions}
       />
       <FormLabel>
         Sigils
@@ -234,7 +170,7 @@ const Finder = () => {
         placeholder="Select one or more sigils"
         isMulti
         onChange={e => setSigils(e.map(r => r.value))}
-        options={sigilOptions}
+        options={options.sigilOptions}
       />
       <Box marginTop="20px">
         <Checkbox
