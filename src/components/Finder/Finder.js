@@ -78,7 +78,7 @@ const Finder = () => {
   };
 
   const generateCombos = () => {
-    fetch(`${baseUrl}/combinations?${qs.stringify({ types, effects, sigils, minLevel, maxLevel, slots, realms, combos: true })}`)
+    fetch(`${baseUrl}?${qs.stringify({ types, effects, sigils, minLevel, maxLevel, slots, realms, combos: true })}`)
       .then(response => response.json())
       .then(response => setCombos(response))
   }
